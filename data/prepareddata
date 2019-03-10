@@ -2,6 +2,7 @@
 The study will analyse open datasets from Wellbeing Toronto (WT) retrieved from the City of Toronto’s Open Data Catalogue 
 https://www.toronto.ca/city-government/data-research-maps/open-data/open-data-catalogue/
 
+This study focused on the data available for the year 2011.
 Several attributes from the WT datasets were joined using the neighbourhood ID as a primary key. 
 Variables were screened for correlations among them and removed where moderate-strong Pearson correlation coefficients were observed.
 
