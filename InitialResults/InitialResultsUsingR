@@ -159,3 +159,50 @@ Model 2: TMCI ~ PopMales + LangChin + LangUrdu + Businesses + SocialAssistance +
   Res.Df    RSS Df Sum of Sq      F Pr(>F)
 1    130 784672                           
 2 131 797977 -1 -13305 2.2043 0.14
+
+############################################################################
+Cross Validation using 70:30
+```{r}
+LMtrain <- WTdata[1:98,]
+LMtest <- WTdata[99:140,]
+
+LMcheck <- lm(TMCI ~ PopMales + LangChin + LangUrdu + Businesses + SocialAssistance + PollutantsAir + PercentMidCentHRHousehold + SocialHousingUnits, data=LMtrain)
+summary(LMcheck)
+
+LMpredicted <- predict(LMcheck, newdata=LMtest, type="response")
+
+#plot(LMpredicted, LMtest$TMCI)
+cor(LMpredicted, LMtest$TMCI, method = "pearson")
+```
+
+Call:
+lm(formula = TMCI ~ PopMales + LangChin + LangUrdu + Businesses + 
+    SocialAssistance + PollutantsAir + PercentMidCentHRHousehold + 
+    SocialHousingUnits, data = LMtrain)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-160.20  -44.43   -1.92   40.27  216.41 
+
+Coefficients:
+                            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                2.684e+01  2.137e+01   1.256 0.212361    
+PopMales                   1.319e-02  3.323e-03   3.968 0.000146 ***
+LangChin                  -2.901e-03  4.984e-03  -0.582 0.561992    
+LangUrdu                  -3.504e-02  1.692e-02  -2.071 0.041246 *  
+Businesses                 1.812e-01  1.487e-02  12.182  < 2e-16 ***
+SocialAssistance           5.986e-02  8.457e-03   7.078 3.23e-10 ***
+PollutantsAir              7.061e-05  4.599e-05   1.535 0.128271    
+PercentMidCentHRHousehold -1.505e+00  5.321e-01  -2.829 0.005766 ** 
+SocialHousingUnits         7.687e-02  1.268e-02   6.062 3.18e-08 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 76.49 on 89 degrees of freedom
+Multiple R-squared:  0.9174,    Adjusted R-squared:   0.91 
+F-statistic: 123.6 on 8 and 89 DF,  p-value: < 2.2e-16
+
+[1] 0.8916494
+
+
+
