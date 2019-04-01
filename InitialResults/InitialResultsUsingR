@@ -2,7 +2,7 @@ Reading the prepared dataset into R
 View first few rows of the data
 ```{r}
 ##getwd()
-WTdata <- read.csv(file="/Users/jenn/Documents/RYERSON/CKME136/Joined data- prepared.csv", header = TRUE)
+WTdata <- read.csv(file="C:/Users/Documents/Joined data- prepared.csv", header = TRUE)
 head(WTdata)
 ```
 
