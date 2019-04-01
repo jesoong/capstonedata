@@ -608,4 +608,162 @@ F-statistic: 107.1 on 6 and 133 DF,  p-value: < 2.2e-16
 data:  residuals(Tfit1)
 W = 0.9858, p-value = 0.1584
 
+############################################################################################
+
+Cross Validation using 3-fold Using Transformations
+
+```{r}
+LMcheck1 <- lm(LogTMCI ~ LDIndex + LogPopMales + LogBusinesses  + LogSocialAssistance    + PercentMidCentHRHousehold + SocialHousingUnits, data=LMtrain1)
+summary(LMcheck1)
+shapiro.test(residuals(LMcheck1))
+LMpredicted1 <- predict(LMcheck1, newdata=LMtest1, type="response")
+summary(LMpredicted1)
+
+RMSE(LMpredicted1, LMtest1$LogTMCI)
+RMSE(exp(LMpredicted1), exp(LMtest1$LogTMCI))
+r1 <- cor(LMpredicted1, LMtest1$LogTMCI, method = "pearson")
+rsq1 <- r1 * r1
+rsq1
+
+LMtrain2 <- rbind(section1, section3)
+LMtest2 <- section2
+
+LMcheck2 <- lm(LogTMCI ~ LDIndex + LogPopMales + LogBusinesses  + LogSocialAssistance    + PercentMidCentHRHousehold + SocialHousingUnits, data=LMtrain2)
+summary(LMcheck2)
+shapiro.test(residuals(LMcheck2))
+LMpredicted2 <- predict(LMcheck2, newdata=LMtest2, type="response")
+summary(LMpredicted2)
+
+RMSE(LMpredicted2, LMtest2$LogTMCI)
+RMSE(exp(LMpredicted2), exp(LMtest2$LogTMCI))
+r2 <- cor(LMpredicted2, LMtest2$LogTMCI, method = "pearson")
+rsq2 <- r2 * r2
+rsq2
+
+LMtrain3 <- rbind(section3, section2)
+LMtest3 <- section1
+
+LMcheck3 <- lm(LogTMCI ~ LDIndex + LogPopMales + LogBusinesses  + LogSocialAssistance    + PercentMidCentHRHousehold + SocialHousingUnits, data=LMtrain3)
+summary(LMcheck3)
+shapiro.test(residuals(LMcheck3))
+LMpredicted3 <- predict(LMcheck3, newdata=LMtest3, type="response")
+summary(LMpredicted3)
+
+RMSE(LMpredicted3, LMtest3$LogTMCI)
+RMSE(exp(LMpredicted3), exp(LMtest3$LogTMCI))
+r3 <- cor(LMpredicted3, LMtest3$LogTMCI, method = "pearson")
+rsq3 <- r3 * r3
+rsq3
+Call:
+lm(formula = LogTMCI ~ LDIndex + LogPopMales + LogBusinesses + 
+    LogSocialAssistance + PercentMidCentHRHousehold + SocialHousingUnits, 
+    data = LMtrain1)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.68393 -0.16814  0.00419  0.15910  0.71796 
+
+Coefficients:
+                            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)               -3.373e-01  6.556e-01  -0.514 0.608264    
+LDIndex                   -5.819e-01  2.590e-01  -2.247 0.027165 *  
+LogPopMales                3.273e-01  9.549e-02   3.428 0.000931 ***
+LogBusinesses              2.748e-01  3.827e-02   7.182 2.20e-10 ***
+LogSocialAssistance        2.520e-01  4.679e-02   5.385 6.07e-07 ***
+PercentMidCentHRHousehold -8.559e-04  1.883e-03  -0.455 0.650533    
+SocialHousingUnits         1.418e-04  4.341e-05   3.267 0.001556 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.2608 on 87 degrees of freedom
+Multiple R-squared:  0.8315,    Adjusted R-squared:  0.8199 
+F-statistic: 71.54 on 6 and 87 DF,  p-value: < 2.2e-16
+
+
+    Shapiro-Wilk normality test
+
+data:  residuals(LMcheck1)
+W = 0.99248, p-value = 0.8782
+
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  4.766   5.304   5.785   5.750   6.193   7.035 
+[1] 0.2880245
+[1] 96.12378
+[1] 0.8128555
+
+Call:
+lm(formula = LogTMCI ~ LDIndex + LogPopMales + LogBusinesses + 
+    LogSocialAssistance + PercentMidCentHRHousehold + SocialHousingUnits, 
+    data = LMtrain2)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.69136 -0.16312  0.00244  0.15898  0.69088 
+
+Coefficients:
+                            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)               -2.611e-01  5.979e-01  -0.437  0.66342    
+LDIndex                   -4.841e-01  2.607e-01  -1.857  0.06670 .  
+LogPopMales                2.800e-01  8.778e-02   3.190  0.00199 ** 
+LogBusinesses              2.131e-01  3.575e-02   5.960 5.39e-08 ***
+LogSocialAssistance        3.420e-01  4.855e-02   7.044 4.34e-10 ***
+PercentMidCentHRHousehold -2.257e-03  1.735e-03  -1.301  0.19668    
+SocialHousingUnits         1.143e-04  6.688e-05   1.709  0.09114 .  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.243 on 86 degrees of freedom
+Multiple R-squared:  0.8531,    Adjusted R-squared:  0.8429 
+F-statistic: 83.26 on 6 and 86 DF,  p-value: < 2.2e-16
+
+
+    Shapiro-Wilk normality test
+
+data:  residuals(LMcheck2)
+W = 0.99262, p-value = 0.89
+
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  4.828   5.370   5.599   5.687   5.942   7.100 
+[1] 0.3006854
+[1] 126.05
+[1] 0.7657069
+
+Call:
+lm(formula = LogTMCI ~ LDIndex + LogPopMales + LogBusinesses + 
+    LogSocialAssistance + PercentMidCentHRHousehold + SocialHousingUnits, 
+    data = LMtrain3)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.74059 -0.11418 -0.01113  0.12310  0.78169 
+
+Coefficients:
+                            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                9.931e-01  6.303e-01   1.575  0.11881    
+LDIndex                   -5.608e-01  2.384e-01  -2.352  0.02093 *  
+LogPopMales                1.131e-02  9.578e-02   0.118  0.90631    
+LogBusinesses              3.431e-01  4.264e-02   8.047 4.24e-12 ***
+LogSocialAssistance        4.052e-01  5.283e-02   7.670 2.45e-11 ***
+PercentMidCentHRHousehold -3.567e-03  1.655e-03  -2.155  0.03396 *  
+SocialHousingUnits         1.315e-04  4.521e-05   2.910  0.00461 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.2631 on 86 degrees of freedom
+Multiple R-squared:  0.8296,    Adjusted R-squared:  0.8178 
+F-statistic:  69.8 on 6 and 86 DF,  p-value: < 2.2e-16
+
+
+    Shapiro-Wilk normality test
+
+data:  residuals(LMcheck3)
+W = 0.9752, p-value = 0.07347
+
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  3.689   5.176   5.491   5.533   5.934   6.709 
+[1] 0.2891331
+[1] 96.99007
+[1] 0.8255744
+
+
 
