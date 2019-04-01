@@ -8,13 +8,11 @@ head(WTdata)
 
 Linear Regression 
 
-Attempt 1:
+Linear Regression Model 1:
 ```{r}
 #colnames(WTdata)
 
 #fit1: linear regression using all variables
-#fit0 <- lm(TMCI ~ LDIndex + PopMales + LangChin  + LangKor + LangPort + LangRuss + LangSpan + LangTagalog + LangUrdu + Businesses + ChildCareSpaces + SocialAssistance + GreenSpaces + PollutantsAir + HomePrices + PercentMidCentHRHousehold + SocialHousingUnits + RoadVolume, data=WTdata)
-#summary(fit0)
 fit1 <- lm(TMCI ~ LDIndex + PopMales + Businesses + ChildCareSpaces + SocialAssistance + GreenSpaces + PollutantsAir + HomePrices + PercentMidCentHRHousehold + SocialHousingUnits+ RoadVolume , data=WTdata)
 summary(fit1)
 ```
@@ -51,7 +49,7 @@ F-statistic: 89.06 on 11 and 128 DF,  p-value: < 2.2e-16
 
 ############################################################################################
 
-Second attempt:
+Linear Regression Model 2:
 ```{r}
 #fit2: try excluding variables that were not significant in fit1
 #fit2 <- lm(TMCI ~ PopMales + LangChin + LangKor + LangUrdu + Businesses + SocialAssistance + PollutantsAir + PercentMidCentHRHousehold + SocialHousingUnits, data=WTdata)
@@ -101,7 +99,7 @@ Model 2: TMCI ~ LDIndex + PopMales + Businesses + SocialAssistance + GreenSpaces
 2    130 894533 -2   -200.39 0.0143 0.9858
 
 ############################################################################################
-Third attempt:
+Linear Regression Model 3:
 ```{r}
 #fit 3: try excluding variables that were not significant in fit2
 #fit3 <- lm(TMCI ~ PopMales + LangChin + LangUrdu + Businesses + SocialAssistance + PollutantsAir + PercentMidCentHRHousehold + SocialHousingUnits, data=WTdata)
@@ -227,7 +225,7 @@ Model 2: TMCI ~ LDIndex + PopMales + Businesses + SocialAssistance + PollutantsA
 2    132 898405 -2   -3872.3 0.2814 0.7552
 
 ##########################################################################################################################
-Cross Validation using 3-fold
+Cross Validation using k-fold, k=3, Linear regression model #3
 ```{r}
 section1 <- WTdata[1:47,]
 section2 <- WTdata[48:94,]
@@ -372,11 +370,11 @@ F-statistic: 92.04 on 7 and 85 DF,  p-value: < 2.2e-16
 [1] 0.8567799
 
 ############################################################################################
-Cross Validation using 3-fold REDUCED
-#RMSE COMPARISON
+Cross Validation using 3-fold - Reduced Model
+#RMSE COMPARISONS:
 #remove PollutantsAir (109, 113, 90)
 #remove LDIndex (109, 112, 89)
-#remove Popmales (89 110 89)
+#remove Popmales (89, 110, 89)
 ```{r}
 LMcheck1 <- lm(TMCI ~   Businesses  + SocialAssistance   + PercentMidCentHRHousehold + SocialHousingUnits, data=LMtrain1)
 summary(LMcheck1)
@@ -389,7 +387,6 @@ RMSE(LMpredicted1, LMtest1$TMCI)
 r1 <- cor(LMpredicted1, LMtest1$TMCI, method = "pearson")
 rsq1 <- r1 * r1
 rsq1
-
 
 LMtrain2 <- rbind(section1, section3)
 LMtest2 <- section2
@@ -519,7 +516,7 @@ W = 0.95358, p-value = 0.002289
 [1] 0.8569845
 
 ############################################################################################
-Checking Full and Reduced Linear Models
+Checking Full and Reduced Linear Models & Residuals (fit3 and fit4)
 ```{r}
 fit4 <- lm(TMCI ~  Businesses  + SocialAssistance  + PercentMidCentHRHousehold + SocialHousingUnits, data=WTdata)
 anova(fit3, fit4) 
@@ -567,14 +564,12 @@ WTdata$LogGreenSpaces <- log(WTdata$GreenSpaces)
 
 #full model:
 #Tfit1 <- lm(LogTMCI ~ LDIndex + LogPopMales + LogBusinesses + ChildCareSpaces + LogSocialAssistance + LogGreenSpaces + PollutantsAir + SqrtHomePrices + PercentMidCentHRHousehold + SqrtSocialHousingUnits+ RoadVolume , data=WTdata)
-
 #reduced model:
 Tfit1 <- lm(LogTMCI ~ LDIndex + LogPopMales + LogBusinesses  + LogSocialAssistance    + PercentMidCentHRHousehold + SocialHousingUnits , data=WTdata)
 summary(Tfit1)
 par(mfrow = c(2, 2))  
 plot(Tfit1)
 shapiro.test(residuals(Tfit1))
-
 ```
 
 Call:
@@ -610,8 +605,7 @@ W = 0.9858, p-value = 0.1584
 
 ############################################################################################
 
-Cross Validation using 3-fold Using Transformations
-
+Cross Validation using 3-fold Using Model with Transformations
 ```{r}
 LMcheck1 <- lm(LogTMCI ~ LDIndex + LogPopMales + LogBusinesses  + LogSocialAssistance    + PercentMidCentHRHousehold + SocialHousingUnits, data=LMtrain1)
 summary(LMcheck1)
@@ -764,6 +758,206 @@ W = 0.9752, p-value = 0.07347
 [1] 0.2891331
 [1] 96.99007
 [1] 0.8255744
+
+###############################################################################################################
+
+Explore the data using gradient boosting model
+```{r}
+#Install and load required packages
+install.packages("caret", dependencies = TRUE)
+install.packages( “doParallel”)
+library(caret)
+library(doParallel)
+
+#First, randomly use a training set made of 70% of the data. The test set would the the remaining 30% of data.
+data <- WTdata
+set.seed(70) #for reprodicibility
+gbmTrain <- data[sample(nrow(data), round(nrow(data)*0.7),  replace = F),]
+
+#Using a tuning grid method to determine which hyper parameters to use for the gbm (trying different values for number of trees, interaction depth and shrinkage). Use a repeated k-folds cross validation with k= 3 repeated 2 times, allowing parallel.
+grid <- expand.grid(n.trees = c(1000,1500), interaction.depth=c(1:3), shrinkage=c(0.01,0.05,0.1), n.minobsinnode=c(10))
+ctrl <- trainControl(method = "repeatedcv",number = 3, repeats = 2, allowParallel = T)
+registerDoParallel(detectCores()-1)
+
+#Build the model and show results.
+set.seed(124) #for reproducibility
+unwantedoutput <- capture.output(GBMModel <- train(TMCI ~ LDIndex + PopMales + Businesses + ChildCareSpaces + SocialAssistance + GreenSpaces + PollutantsAir + HomePrices + PercentMidCentHRHousehold + SocialHousingUnits+ RoadVolume, data = gbmTrain, method = "gbm", trControl = ctrl, tuneGrid = grid))
+print(GBMModel)
+```
+
+Stochastic Gradient Boosting 
+
+98 samples
+11 predictors
+
+No pre-processing
+Resampling: Cross-Validated (3 fold, repeated 2 times) 
+Summary of sample sizes: 66, 65, 65, 66, 66, 64, ... 
+Resampling results across tuning parameters:
+
+  shrinkage  interaction.depth  n.trees  RMSE      Rsquared   MAE      
+  0.01       1                  1000     124.5538  0.6702776   91.28352
+  0.01       1                  1500     125.9143  0.6610781   93.81676
+  0.01       2                  1000     124.9442  0.6647874   91.69713
+  0.01       2                  1500     126.3767  0.6553488   93.94623
+  0.01       3                  1000     122.9220  0.6773135   91.01083
+  0.01       3                  1500     124.3726  0.6662377   92.98804
+  0.05       1                  1000     130.5444  0.6314608   98.48488
+  0.05       1                  1500     133.4790  0.6162899  101.08602
+  0.05       2                  1000     133.8058  0.6261367  100.82480
+  0.05       2                  1500     135.9480  0.6167106  102.71247
+  0.05       3                  1000     132.2098  0.6242590   99.63868
+  0.05       3                  1500     133.7175  0.6178934  101.08170
+  0.10       1                  1000     135.7826  0.5968569  101.99444
+  0.10       1                  1500     138.4157  0.5868969  104.34030
+  0.10       2                  1000     133.5068  0.6142414  100.34431
+  0.10       2                  1500     134.3734  0.6101425  101.03826
+  0.10       3                  1000     134.2735  0.6163732  101.37481
+  0.10       3                  1500     135.2182  0.6113826  102.03264
+
+Tuning parameter 'n.minobsinnode' was held constant at a value of 10
+RMSE was used to select the optimal model using the smallest value.
+The final values used for the model were n.trees = 1000, interaction.depth = 3, shrinkage = 0.01
+ and n.minobsinnode = 10.
+
+############################################################################
+Try the same thing with n.trees = c(100,500) since less trees seems better for reducing RMSE
+```{r}
+grid <- expand.grid(n.trees = c(100,500), interaction.depth=c(1:3), shrinkage=c(0.01,0.05,0.1), n.minobsinnode=c(10))
+ctrl <- trainControl(method = "repeatedcv",number = 3, repeats = 2, allowParallel = T)
+registerDoParallel(detectCores()-1)
+
+set.seed(124) 
+unwantedoutput <- capture.output(GBMModel <- train(TMCI ~ LDIndex + PopMales + Businesses + ChildCareSpaces + SocialAssistance + GreenSpaces + PollutantsAir + HomePrices + PercentMidCentHRHousehold + SocialHousingUnits+ RoadVolume, data = gbmTrain, method = "gbm", trControl = ctrl, tuneGrid = grid))
+
+print(GBMModel)
+```
+
+Stochastic Gradient Boosting 
+
+98 samples
+11 predictors
+
+No pre-processing
+Resampling: Cross-Validated (3 fold, repeated 2 times) 
+Summary of sample sizes: 66, 65, 65, 66, 66, 64, ... 
+Resampling results across tuning parameters:
+
+  shrinkage  interaction.depth  n.trees  RMSE      Rsquared   MAE      
+  0.01       1                  100      149.8561  0.6247620  109.07270
+  0.01       1                  500      122.9331  0.6776462   88.10746
+  0.01       2                  100      145.9429  0.6281188  106.04935
+  0.01       2                  500      123.6010  0.6725038   88.49195
+  0.01       3                  100      146.6359  0.6252309  106.50907
+  0.01       3                  500      121.9999  0.6826048   87.93154
+  0.05       1                  100      121.7388  0.6860385   87.45621
+  0.05       1                  500      126.3281  0.6552634   94.09932
+  0.05       2                  100      124.0571  0.6806600   90.89883
+  0.05       2                  500      130.4522  0.6395744   97.87433
+  0.05       3                  100      124.2179  0.6739933   89.72147
+  0.05       3                  500      130.1854  0.6356540   97.45100
+  0.10       1                  100      126.0861  0.6545198   93.03760
+  0.10       1                  500      131.9145  0.6119792   97.79394
+  0.10       2                  100      126.5011  0.6594136   92.67387
+  0.10       2                  500      131.1895  0.6253479   98.15926
+  0.10       3                  100      124.3492  0.6615998   92.49998
+  0.10       3                  500      132.1631  0.6263421  100.34154
+
+Tuning parameter 'n.minobsinnode' was held constant at a value of 10
+RMSE was used to select the optimal model using the smallest value.
+The final values used for the model were n.trees = 100, interaction.depth = 1, shrinkage = 0.05
+ and n.minobsinnode = 10.
+
+############################################################################
+
+Try the gbm using those settings
+```{r}
+GB1=gbm(TMCI ~ LDIndex + PopMales + Businesses + ChildCareSpaces + SocialAssistance + GreenSpaces + PollutantsAir + HomePrices + PercentMidCentHRHousehold + SocialHousingUnits+ RoadVolume, data=WTdata,distribution = "gaussian",n.trees = 100, shrinkage = 0.05, interaction.depth = 1)
+
+summary(GB1)
+```
+ 
+var               rel.inf
+<fctr>             <dbl>
+Businesses            Businesses        34.9107346        
+PopMales            PopMales        25.5058026        
+SocialAssistance        SocialAssistance    21.9354783        
+SocialHousingUnits        SocialHousingUnits    9.1917837        
+PollutantsAir            PollutantsAir        4.2195104        
+LDIndex                LDIndex            1.9863046        
+GreenSpaces            GreenSpaces        1.0937376        
+HomePrices            HomePrices        0.6078615        
+PercentMidCentHRHousehold    PercentMidCentHRHousehold    0.3608699        
+RoadVolume            RoadVolume        0.1879166    
+ChildCareSpaces        ChildCareSpaces    0.0000000
+
+############################################################################
+Cross validation for gbm using 3-fold 
+```{r}
+#Partition the data in the same way to compare to LM model cross validation results
+section1 <- WTdata[1:47,]
+section2 <- WTdata[48:94,]
+section3 <- WTdata[95:140,]
+set.seed(999) #for reproducibility
+#define RMSE function
+RMSE = function(pred, act){
+  sqrt(mean((pred - act)^2))
+}
+
+#First 
+GBtrain1 <- rbind(section1, section2)
+GBtest1 <- section3
+
+GBcheck1 <- gbm(TMCI ~ LDIndex + PopMales + Businesses + ChildCareSpaces + SocialAssistance + GreenSpaces + PollutantsAir + HomePrices + PercentMidCentHRHousehold + SocialHousingUnits+ RoadVolume, data=GBtrain1, distribution = "gaussian",n.trees = 100, shrinkage = 0.05, interaction.depth = 1)
+
+GBpredicted1 <- predict(GBcheck1, newdata=GBtest1, n.trees = 100, type="response")
+
+summary(GBpredicted1)
+RMSE(GBpredicted1, GBtest1$TMCI)
+R1 <- cor(GBpredicted1, GBtest1$TMCI, method = "pearson")
+Rsq1 <- R1*R1
+Rsq1
+
+#Second 
+GBtrain2 <- rbind(section1, section3)
+GBtest2 <- section2
+
+GBcheck2 <- gbm(TMCI ~ LDIndex + PopMales + Businesses + ChildCareSpaces + SocialAssistance + GreenSpaces + PollutantsAir + HomePrices + PercentMidCentHRHousehold + SocialHousingUnits+ RoadVolume, data=GBtrain2, distribution = "gaussian",n.trees = 100, shrinkage = 0.05, interaction.depth = 1)
+
+GBpredicted2 <- predict(GBcheck2, newdata=GBtest2, n.trees = 100, type="response")
+
+summary(GBpredicted2)
+RMSE(GBpredicted2, GBtest2$TMCI)
+R2 <- cor(GBpredicted2, GBtest2$TMCI, method = "pearson")
+Rsq2 <- R2*R2
+Rsq2
+
+#Third 
+GBtrain3 <- rbind(section3, section2)
+GBtest3 <- section1
+
+GBcheck3 <- gbm(TMCI ~ LDIndex + PopMales + Businesses + ChildCareSpaces + SocialAssistance + GreenSpaces + PollutantsAir + HomePrices + PercentMidCentHRHousehold + SocialHousingUnits+ RoadVolume, data=GBtrain3, distribution = "gaussian",n.trees = 100, shrinkage = 0.05, interaction.depth = 1)
+
+GBpredicted3 <- predict(GBcheck3, newdata=GBtest3, n.trees = 100, type="response")
+summary(GBpredicted3)
+
+RMSE(GBpredicted3, GBtest3$TMCI)
+R3 <- cor(GBpredicted3, GBtest3$TMCI, method = "pearson")
+Rsq3 <- R3 * R3
+Rsq3
+```
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  169.0   205.8   365.4   407.3   595.4   886.0 
+[1] 137.1757
+[1] 0.7223210
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  148.1   176.5   244.2   298.0   343.3   739.6 
+[1] 185.619
+[1] 0.6819460
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  152.1   184.1   279.3   326.0   429.9   731.1 
+[1] 112.6225
+[1] 0.8162667
 
 
 
