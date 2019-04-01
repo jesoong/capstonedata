@@ -1,1 +1,559 @@
+Reading the prepared dataset into R, view first few rows of the data
+
+```{r}
+WTdata <- read.csv(file="C:/Users/Documents/Joined data- for modeling.csv", header = TRUE)
+head(WTdata)
+```
+############################################################################################
+
+Linear Regression 
+
+Attempt 1:
+```{r}
+#colnames(WTdata)
+
+#fit1: linear regression using all variables
+#fit0 <- lm(TMCI ~ LDIndex + PopMales + LangChin  + LangKor + LangPort + LangRuss + LangSpan + LangTagalog + LangUrdu + Businesses + ChildCareSpaces + SocialAssistance + GreenSpaces + PollutantsAir + HomePrices + PercentMidCentHRHousehold + SocialHousingUnits + RoadVolume, data=WTdata)
+#summary(fit0)
+fit1 <- lm(TMCI ~ LDIndex + PopMales + Businesses + ChildCareSpaces + SocialAssistance + GreenSpaces + PollutantsAir + HomePrices + PercentMidCentHRHousehold + SocialHousingUnits+ RoadVolume , data=WTdata)
+summary(fit1)
+```
+Call:
+lm(formula = TMCI ~ LDIndex + PopMales + Businesses + ChildCareSpaces + 
+    SocialAssistance + GreenSpaces + PollutantsAir + HomePrices + 
+    PercentMidCentHRHousehold + SocialHousingUnits + RoadVolume, 
+    data = WTdata)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-332.13  -37.77   -1.00   47.49  242.72 
+
+Coefficients:
+                            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                1.396e+02  5.956e+01   2.344   0.0206 *  
+LDIndex                   -1.254e+02  6.916e+01  -1.813   0.0722 .  
+PopMales                   6.121e-03  2.867e-03   2.135   0.0347 *  
+Businesses                 1.813e-01  1.493e-02  12.141  < 2e-16 ***
+ChildCareSpaces            1.119e-02  9.859e-02   0.113   0.9098    
+SocialAssistance           6.778e-02  8.438e-03   8.033 5.40e-13 ***
+GreenSpaces               -3.818e+00  6.193e+00  -0.616   0.5387    
+PollutantsAir              1.002e-04  4.516e-05   2.219   0.0283 *  
+HomePrices                -4.929e-06  3.944e-05  -0.125   0.9007    
+PercentMidCentHRHousehold -1.449e+00  4.837e-01  -2.995   0.0033 ** 
+SocialHousingUnits         7.792e-02  1.315e-02   5.926 2.69e-08 ***
+RoadVolume                -1.166e-03  3.617e-03  -0.322   0.7477    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 83.59 on 128 degrees of freedom
+Multiple R-squared:  0.8844,    Adjusted R-squared:  0.8745 
+F-statistic: 89.06 on 11 and 128 DF,  p-value: < 2.2e-16
+
+############################################################################################
+
+Second attempt:
+```{r}
+#fit2: try excluding variables that were not significant in fit1
+#fit2 <- lm(TMCI ~ PopMales + LangChin + LangKor + LangUrdu + Businesses + SocialAssistance + PollutantsAir + PercentMidCentHRHousehold + SocialHousingUnits, data=WTdata)
+fit2 <- lm(TMCI ~ LDIndex + PopMales + Businesses  + SocialAssistance + GreenSpaces + PollutantsAir  + PercentMidCentHRHousehold + SocialHousingUnits+ RoadVolume , data=WTdata)
+summary(fit2)
+
+anova(fit1, fit2)
+```
+Call:
+lm(formula = TMCI ~ LDIndex + PopMales + Businesses + SocialAssistance + 
+    GreenSpaces + PollutantsAir + PercentMidCentHRHousehold + 
+    SocialHousingUnits + RoadVolume, data = WTdata)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-331.18  -38.33   -1.36   47.86  242.44 
+
+Coefficients:
+                            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                1.353e+02  3.768e+01   3.592 0.000463 ***
+LDIndex                   -1.219e+02  5.725e+01  -2.130 0.035068 *  
+PopMales                   6.170e-03  2.568e-03   2.402 0.017700 *  
+Businesses                 1.812e-01  1.481e-02  12.238  < 2e-16 ***
+SocialAssistance           6.815e-02  7.789e-03   8.749 9.64e-15 ***
+GreenSpaces               -3.803e+00  6.100e+00  -0.624 0.534027    
+PollutantsAir              1.006e-04  4.453e-05   2.260 0.025506 *  
+PercentMidCentHRHousehold -1.458e+00  4.764e-01  -3.062 0.002675 ** 
+SocialHousingUnits         7.797e-02  1.275e-02   6.115 1.05e-08 ***
+RoadVolume                -1.225e-03  3.539e-03  -0.346 0.729785    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 82.95 on 130 degrees of freedom
+Multiple R-squared:  0.8844,    Adjusted R-squared:  0.8764 
+F-statistic: 110.5 on 9 and 130 DF,  p-value: < 2.2e-16
+
+Analysis of Variance Table
+
+Model 1: TMCI ~ LDIndex + PopMales + Businesses + ChildCareSpaces + SocialAssistance + 
+    GreenSpaces + PollutantsAir + HomePrices + PercentMidCentHRHousehold + 
+    SocialHousingUnits + RoadVolume
+Model 2: TMCI ~ LDIndex + PopMales + Businesses + SocialAssistance + GreenSpaces + 
+    PollutantsAir + PercentMidCentHRHousehold + SocialHousingUnits + 
+    RoadVolume
+  Res.Df    RSS Df Sum of Sq      F Pr(>F)
+1    128 894333                           
+2    130 894533 -2   -200.39 0.0143 0.9858
+
+############################################################################################
+Third attempt:
+```{r}
+#fit 3: try excluding variables that were not significant in fit2
+#fit3 <- lm(TMCI ~ PopMales + LangChin + LangUrdu + Businesses + SocialAssistance + PollutantsAir + PercentMidCentHRHousehold + SocialHousingUnits, data=WTdata)
+fit3 <- lm(TMCI ~ LDIndex + PopMales + Businesses  + SocialAssistance + PollutantsAir  + PercentMidCentHRHousehold + SocialHousingUnits , data=WTdata)
+summary(fit3)
+#all variables seem significant to the model based on their p-values.
+
+anova(fit2, fit3)
+#ANOVA indicates that removing the variable from fit2 did not significantly affect the performance of the model for fit3
+```
+
+Show in New WindowClear OutputExpand/Collapse Output
+
+Call:
+lm(formula = TMCI ~ LDIndex + PopMales + Businesses + ChildCareSpaces + 
+    SocialAssistance + GreenSpaces + PollutantsAir + HomePrices + 
+    PercentMidCentHRHousehold + SocialHousingUnits + RoadVolume, 
+    data = WTdata)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-332.13  -37.77   -1.00   47.49  242.72 
+
+Coefficients:
+                            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                1.396e+02  5.956e+01   2.344   0.0206 *  
+LDIndex                   -1.254e+02  6.916e+01  -1.813   0.0722 .  
+PopMales                   6.121e-03  2.867e-03   2.135   0.0347 *  
+Businesses                 1.813e-01  1.493e-02  12.141  < 2e-16 ***
+ChildCareSpaces            1.119e-02  9.859e-02   0.113   0.9098    
+SocialAssistance           6.778e-02  8.438e-03   8.033 5.40e-13 ***
+GreenSpaces               -3.818e+00  6.193e+00  -0.616   0.5387    
+PollutantsAir              1.002e-04  4.516e-05   2.219   0.0283 *  
+HomePrices                -4.929e-06  3.944e-05  -0.125   0.9007    
+PercentMidCentHRHousehold -1.449e+00  4.837e-01  -2.995   0.0033 ** 
+SocialHousingUnits         7.792e-02  1.315e-02   5.926 2.69e-08 ***
+RoadVolume                -1.166e-03  3.617e-03  -0.322   0.7477    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 83.59 on 128 degrees of freedom
+Multiple R-squared:  0.8844,    Adjusted R-squared:  0.8745 
+F-statistic: 89.06 on 11 and 128 DF,  p-value: < 2.2e-16
+
+Show in New WindowClear OutputExpand/Collapse Output
+
+Call:
+lm(formula = TMCI ~ LDIndex + PopMales + Businesses + SocialAssistance + 
+    GreenSpaces + PollutantsAir + PercentMidCentHRHousehold + 
+    SocialHousingUnits + RoadVolume, data = WTdata)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-331.18  -38.33   -1.36   47.86  242.44 
+
+Coefficients:
+                            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                1.353e+02  3.768e+01   3.592 0.000463 ***
+LDIndex                   -1.219e+02  5.725e+01  -2.130 0.035068 *  
+PopMales                   6.170e-03  2.568e-03   2.402 0.017700 *  
+Businesses                 1.812e-01  1.481e-02  12.238  < 2e-16 ***
+SocialAssistance           6.815e-02  7.789e-03   8.749 9.64e-15 ***
+GreenSpaces               -3.803e+00  6.100e+00  -0.624 0.534027    
+PollutantsAir              1.006e-04  4.453e-05   2.260 0.025506 *  
+PercentMidCentHRHousehold -1.458e+00  4.764e-01  -3.062 0.002675 ** 
+SocialHousingUnits         7.797e-02  1.275e-02   6.115 1.05e-08 ***
+RoadVolume                -1.225e-03  3.539e-03  -0.346 0.729785    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 82.95 on 130 degrees of freedom
+Multiple R-squared:  0.8844,    Adjusted R-squared:  0.8764 
+F-statistic: 110.5 on 9 and 130 DF,  p-value: < 2.2e-16
+
+Analysis of Variance Table
+
+Model 1: TMCI ~ LDIndex + PopMales + Businesses + ChildCareSpaces + SocialAssistance + 
+    GreenSpaces + PollutantsAir + HomePrices + PercentMidCentHRHousehold + 
+    SocialHousingUnits + RoadVolume
+Model 2: TMCI ~ LDIndex + PopMales + Businesses + SocialAssistance + GreenSpaces + 
+    PollutantsAir + PercentMidCentHRHousehold + SocialHousingUnits + 
+    RoadVolume
+  Res.Df    RSS Df Sum of Sq      F Pr(>F)
+1    128 894333                           
+2    130 894533 -2   -200.39 0.0143 0.9858
+Show in New WindowClear OutputExpand/Collapse Output
+
+Call:
+lm(formula = TMCI ~ LDIndex + PopMales + Businesses + SocialAssistance + 
+    PollutantsAir + PercentMidCentHRHousehold + SocialHousingUnits, 
+    data = WTdata)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-328.07  -41.89   -4.23   50.57  247.50 
+
+Coefficients:
+                            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                1.305e+02  3.543e+01   3.685 0.000333 ***
+LDIndex                   -1.201e+02  5.666e+01  -2.120 0.035850 *  
+PopMales                   5.599e-03  2.398e-03   2.335 0.021026 *  
+Businesses                 1.817e-01  1.459e-02  12.455  < 2e-16 ***
+SocialAssistance           6.827e-02  7.744e-03   8.816 6.02e-15 ***
+PollutantsAir              9.827e-05  4.418e-05   2.225 0.027811 *  
+PercentMidCentHRHousehold -1.448e+00  4.697e-01  -3.083 0.002493 ** 
+SocialHousingUnits         7.890e-02  1.262e-02   6.252 5.20e-09 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 82.5 on 132 degrees of freedom
+Multiple R-squared:  0.8839,    Adjusted R-squared:  0.8778 
+F-statistic: 143.6 on 7 and 132 DF,  p-value: < 2.2e-16
+
+Analysis of Variance Table
+
+Model 1: TMCI ~ LDIndex + PopMales + Businesses + SocialAssistance + GreenSpaces + 
+    PollutantsAir + PercentMidCentHRHousehold + SocialHousingUnits + 
+    RoadVolume
+Model 2: TMCI ~ LDIndex + PopMales + Businesses + SocialAssistance + PollutantsAir + 
+    PercentMidCentHRHousehold + SocialHousingUnits
+  Res.Df    RSS Df Sum of Sq      F Pr(>F)
+1    130 894533                           
+2    132 898405 -2   -3872.3 0.2814 0.7552
+
+##########################################################################################################################
+Cross Validation using 3-fold
+```{r}
+section1 <- WTdata[1:47,]
+section2 <- WTdata[48:94,]
+section3 <- WTdata[95:140,]
+
+LMtrain1 <- rbind(section1, section2)
+LMtest1 <- section3
+
+LMcheck1 <- lm(TMCI ~ LDIndex + PopMales + Businesses  + SocialAssistance + PollutantsAir  + PercentMidCentHRHousehold + SocialHousingUnits, data=LMtrain1)
+summary(LMcheck1)
+
+LMpredicted1 <- predict(LMcheck1, newdata=LMtest1, type="response")
+summary(LMpredicted1)
+
+RMSE = function(pred, act){
+  sqrt(mean((pred - act)^2))
+}
+RMSE(LMpredicted1, LMtest1$TMCI)
+r1 <- cor(LMpredicted1, LMtest1$TMCI, method = "pearson")
+rsq1 <- r1 * r1
+rsq1
+
+LMtrain2 <- rbind(section1, section3)
+LMtest2 <- section2
+
+LMcheck2 <- lm(TMCI ~   LDIndex + PopMales + Businesses  + SocialAssistance + PollutantsAir  + PercentMidCentHRHousehold + SocialHousingUnits, data=LMtrain2)
+summary(LMcheck2)
+
+LMpredicted2 <- predict(LMcheck2, newdata=LMtest2, type="response")
+summary(LMpredicted2)
+
+RMSE(LMpredicted2, LMtest2$TMCI)
+r2 <- cor(LMpredicted2, LMtest2$TMCI, method = "pearson")
+rsq2 <- r2 * r2
+rsq2
+
+LMtrain3 <- rbind(section3, section2)
+LMtest3 <- section1
+
+LMcheck3 <- lm(TMCI ~   LDIndex + PopMales + Businesses  + SocialAssistance + PollutantsAir  + PercentMidCentHRHousehold + SocialHousingUnits, data=LMtrain3)
+summary(LMcheck3)
+
+LMpredicted3 <- predict(LMcheck3, newdata=LMtest3, type="response")
+summary(LMpredicted3)
+
+RMSE(LMpredicted3, LMtest3$TMCI)
+r3 <- cor(LMpredicted3, LMtest3$TMCI, method = "pearson")
+rsq3 <- r3 * r3
+rsq3
+```
+Call:
+lm(formula = TMCI ~ LDIndex + PopMales + Businesses + SocialAssistance + 
+    PollutantsAir + PercentMidCentHRHousehold + SocialHousingUnits, 
+    data = LMtrain1)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-168.69  -37.12   -5.16   40.71  218.40 
+
+Coefficients:
+                            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                1.098e+02  4.582e+01   2.396   0.0187 *  
+LDIndex                   -1.434e+02  7.306e+01  -1.963   0.0529 .  
+PopMales                   1.331e-02  2.960e-03   4.495 2.16e-05 ***
+Businesses                 1.884e-01  1.555e-02  12.116  < 2e-16 ***
+SocialAssistance           5.832e-02  8.329e-03   7.003 5.24e-10 ***
+PollutantsAir              5.307e-05  4.525e-05   1.173   0.2441    
+PercentMidCentHRHousehold -1.329e+00  5.668e-01  -2.345   0.0213 *  
+SocialHousingUnits         7.346e-02  1.307e-02   5.619 2.32e-07 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 77.2 on 86 degrees of freedom
+Multiple R-squared:  0.9159,    Adjusted R-squared:  0.9091 
+F-statistic: 133.9 on 7 and 86 DF,  p-value: < 2.2e-16
+
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  111.9   201.0   338.4   378.2   508.3  1099.0 
+[1] 106.1614
+[1] 0.7936345
+
+Call:
+lm(formula = TMCI ~ LDIndex + PopMales + Businesses + SocialAssistance + 
+    PollutantsAir + PercentMidCentHRHousehold + SocialHousingUnits, 
+    data = LMtrain2)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-241.225  -35.562   -0.807   38.357  223.096 
+
+Coefficients:
+                            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                1.459e+02  4.096e+01   3.561 0.000609 ***
+LDIndex                   -1.459e+02  6.357e+01  -2.295 0.024184 *  
+PopMales                   7.194e-03  2.649e-03   2.715 0.008021 ** 
+Businesses                 1.173e-01  1.989e-02   5.898 7.26e-08 ***
+SocialAssistance           7.818e-02  8.548e-03   9.147 2.72e-14 ***
+PollutantsAir              2.099e-04  4.476e-05   4.689 1.04e-05 ***
+PercentMidCentHRHousehold -9.605e-01  5.500e-01  -1.747 0.084325 .  
+SocialHousingUnits         2.389e-02  2.041e-02   1.171 0.245035    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 73.58 on 85 degrees of freedom
+Multiple R-squared:  0.8902,    Adjusted R-squared:  0.8812 
+F-statistic: 98.49 on 7 and 85 DF,  p-value: < 2.2e-16
+
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  111.3   204.0   240.2   312.7   358.9   883.4 
+[1] 141.5704
+[1] 0.8879573
+
+Call:
+lm(formula = TMCI ~ LDIndex + PopMales + Businesses + SocialAssistance + 
+    PollutantsAir + PercentMidCentHRHousehold + SocialHousingUnits, 
+    data = LMtrain3)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-323.53  -40.23    0.43   44.43  204.02 
+
+Coefficients:
+                            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                1.533e+02  4.008e+01   3.826 0.000248 ***
+LDIndex                   -1.252e+02  6.657e+01  -1.880 0.063491 .  
+PopMales                   3.490e-04  2.915e-03   0.120 0.904975    
+Businesses                 2.021e-01  1.759e-02  11.495  < 2e-16 ***
+SocialAssistance           8.246e-02  1.173e-02   7.029 4.88e-10 ***
+PollutantsAir             -9.085e-06  1.024e-04  -0.089 0.929479    
+PercentMidCentHRHousehold -1.937e+00  5.560e-01  -3.483 0.000785 ***
+SocialHousingUnits         8.334e-02  1.527e-02   5.458 4.68e-07 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 84.13 on 85 degrees of freedom
+Multiple R-squared:  0.8834,    Adjusted R-squared:  0.8738 
+F-statistic: 92.04 on 7 and 85 DF,  p-value: < 2.2e-16
+
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  25.23  178.30  247.40  327.80  400.60  945.70 
+[1] 89.96489
+[1] 0.8567799
+
+############################################################################################
+Cross Validation using 3-fold REDUCED
+#RMSE COMPARISON
+#remove PollutantsAir (109, 113, 90)
+#remove LDIndex (109, 112, 89)
+#remove Popmales (89 110 89)
+```{r}
+LMcheck1 <- lm(TMCI ~   Businesses  + SocialAssistance   + PercentMidCentHRHousehold + SocialHousingUnits, data=LMtrain1)
+summary(LMcheck1)
+shapiro.test(residuals(LMcheck1))
+
+LMpredicted1 <- predict(LMcheck1, newdata=LMtest1, type="response")
+summary(LMpredicted1)
+
+RMSE(LMpredicted1, LMtest1$TMCI)
+r1 <- cor(LMpredicted1, LMtest1$TMCI, method = "pearson")
+rsq1 <- r1 * r1
+rsq1
+
+
+LMtrain2 <- rbind(section1, section3)
+LMtest2 <- section2
+
+LMcheck2 <- lm(TMCI ~     Businesses  + SocialAssistance   + PercentMidCentHRHousehold + SocialHousingUnits, data=LMtrain2)
+summary(LMcheck2)
+shapiro.test(residuals(LMcheck2))
+LMpredicted2 <- predict(LMcheck2, newdata=LMtest2, type="response")
+summary(LMpredicted2)
+
+RMSE(LMpredicted2, LMtest2$TMCI)
+r2 <- cor(LMpredicted2, LMtest2$TMCI, method = "pearson")
+rsq2 <- r2 * r2
+rsq2
+
+LMtrain3 <- rbind(section3, section2)
+LMtest3 <- section1
+
+LMcheck3 <- lm(TMCI ~     Businesses  + SocialAssistance   + PercentMidCentHRHousehold + SocialHousingUnits, data=LMtrain3)
+summary(LMcheck3)
+shapiro.test(residuals(LMcheck3))
+LMpredicted3 <- predict(LMcheck3, newdata=LMtest3, type="response")
+summary(LMpredicted3)
+
+RMSE(LMpredicted3, LMtest3$TMCI)
+r3 <- cor(LMpredicted3, LMtest3$TMCI, method = "pearson")
+rsq3 <- r3 * r3
+rsq3
+```
+Call:
+lm(formula = TMCI ~ Businesses + SocialAssistance + PercentMidCentHRHousehold + 
+    SocialHousingUnits, data = LMtrain1)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-220.442  -45.496   -7.832   37.798  239.372 
+
+Coefficients:
+                           Estimate Std. Error t value Pr(>|t|)    
+(Intercept)               97.032021  16.717545   5.804 9.79e-08 ***
+Businesses                 0.221605   0.014041  15.782  < 2e-16 ***
+SocialAssistance           0.076516   0.007638  10.017 2.95e-16 ***
+PercentMidCentHRHousehold -2.231858   0.560829  -3.980 0.000141 ***
+SocialHousingUnits         0.079229   0.013788   5.746 1.26e-07 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 86.12 on 89 degrees of freedom
+Multiple R-squared:  0.8917,    Adjusted R-squared:  0.8869 
+F-statistic: 183.3 on 4 and 89 DF,  p-value: < 2.2e-16
+
+
+    Shapiro-Wilk normality test
+
+data:  residuals(LMcheck1)
+W = 0.96169, p-value = 0.007506
+
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  78.37  202.40  325.40  358.30  488.10  999.80 
+[1] 87.8747
+[1] 0.8195496
+
+Call:
+lm(formula = TMCI ~ Businesses + SocialAssistance + PercentMidCentHRHousehold + 
+    SocialHousingUnits, data = LMtrain2)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-322.52  -39.22   -8.97   40.09  298.38 
+
+Coefficients:
+                           Estimate Std. Error t value Pr(>|t|)    
+(Intercept)               96.930912  18.676963   5.190 1.34e-06 ***
+Businesses                 0.184158   0.016599  11.094  < 2e-16 ***
+SocialAssistance           0.085426   0.007623  11.206  < 2e-16 ***
+PercentMidCentHRHousehold -1.765260   0.599405  -2.945  0.00413 ** 
+SocialHousingUnits         0.035030   0.022646   1.547  0.12548    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 84 on 88 degrees of freedom
+Multiple R-squared:  0.8519,    Adjusted R-squared:  0.8452 
+F-statistic: 126.6 on 4 and 88 DF,  p-value: < 2.2e-16
+
+
+    Shapiro-Wilk normality test
+
+data:  residuals(LMcheck2)
+W = 0.9343, p-value = 0.0001575
+
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  126.4   216.7   259.9   336.1   369.1   993.5 
+[1] 109.532
+[1] 0.9069671
+
+Call:
+lm(formula = TMCI ~ Businesses + SocialAssistance + PercentMidCentHRHousehold + 
+    SocialHousingUnits, data = LMtrain3)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-338.43  -41.03   -1.60   47.81  217.47 
+
+Coefficients:
+                           Estimate Std. Error t value Pr(>|t|)    
+(Intercept)               91.766553  17.364668   5.285 9.05e-07 ***
+Businesses                 0.197893   0.014665  13.494  < 2e-16 ***
+SocialAssistance           0.075040   0.008319   9.020 3.73e-14 ***
+PercentMidCentHRHousehold -2.129740   0.519475  -4.100 9.19e-05 ***
+SocialHousingUnits         0.090810   0.014428   6.294 1.17e-08 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 84.4 on 88 degrees of freedom
+Multiple R-squared:  0.8786,    Adjusted R-squared:  0.873 
+F-statistic: 159.2 on 4 and 88 DF,  p-value: < 2.2e-16
+
+
+    Shapiro-Wilk normality test
+
+data:  residuals(LMcheck3)
+W = 0.95358, p-value = 0.002289
+
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  29.52  183.60  253.00  334.20  394.80  931.50 
+[1] 88.81928
+[1] 0.8569845
+
+############################################################################################
+CHECKING LINEAR MODELS FULL & REDUCED
+```{r}
+anova(fit3, fit6) 
+
+par(mfrow = c(2, 2))
+plot(fit3)
+par(mfrow = c(2, 2))
+plot(fit6)
+shapiro.test(residuals(fit3))
+shapiro.test(residuals(fit6))
+```
+
+Analysis of Variance Table
+
+Model 1: TMCI ~ LDIndex + PopMales + Businesses + SocialAssistance + PollutantsAir + 
+    PercentMidCentHRHousehold + SocialHousingUnits
+Model 2: TMCI ~ Businesses + SocialAssistance + PercentMidCentHRHousehold + 
+    SocialHousingUnits
+  Res.Df    RSS Df Sum of Sq      F  Pr(>F)   
+1    132 898405                               
+2    135 990301 -3    -91896 4.5007 0.00485 **
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+    Shapiro-Wilk normality test
+
+data:  residuals(fit3)
+W = 0.96666, p-value = 0.0017
+
+
+    Shapiro-Wilk normality test
+
+data:  residuals(fit6)
+W = 0.95405, p-value = 0.0001293
+
+
+
 
