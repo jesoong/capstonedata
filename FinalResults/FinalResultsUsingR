@@ -52,7 +52,6 @@ F-statistic: 89.06 on 11 and 128 DF,  p-value: < 2.2e-16
 Linear Regression Model 2:
 ```{r}
 #fit2: try excluding variables that were not significant in fit1
-#fit2 <- lm(TMCI ~ PopMales + LangChin + LangKor + LangUrdu + Businesses + SocialAssistance + PollutantsAir + PercentMidCentHRHousehold + SocialHousingUnits, data=WTdata)
 fit2 <- lm(TMCI ~ LDIndex + PopMales + Businesses  + SocialAssistance + GreenSpaces + PollutantsAir  + PercentMidCentHRHousehold + SocialHousingUnits+ RoadVolume , data=WTdata)
 summary(fit2)
 
@@ -102,90 +101,13 @@ Model 2: TMCI ~ LDIndex + PopMales + Businesses + SocialAssistance + GreenSpaces
 Linear Regression Model 3:
 ```{r}
 #fit 3: try excluding variables that were not significant in fit2
-#fit3 <- lm(TMCI ~ PopMales + LangChin + LangUrdu + Businesses + SocialAssistance + PollutantsAir + PercentMidCentHRHousehold + SocialHousingUnits, data=WTdata)
 fit3 <- lm(TMCI ~ LDIndex + PopMales + Businesses  + SocialAssistance + PollutantsAir  + PercentMidCentHRHousehold + SocialHousingUnits , data=WTdata)
 summary(fit3)
-#all variables seem significant to the model based on their p-values.
+#all variables now seem significant to the model based on their p-values.
 
 anova(fit2, fit3)
 #ANOVA indicates that removing the variable from fit2 did not significantly affect the performance of the model for fit3
 ```
-
-Show in New WindowClear OutputExpand/Collapse Output
-
-Call:
-lm(formula = TMCI ~ LDIndex + PopMales + Businesses + ChildCareSpaces + 
-    SocialAssistance + GreenSpaces + PollutantsAir + HomePrices + 
-    PercentMidCentHRHousehold + SocialHousingUnits + RoadVolume, 
-    data = WTdata)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--332.13  -37.77   -1.00   47.49  242.72 
-
-Coefficients:
-                            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)                1.396e+02  5.956e+01   2.344   0.0206 *  
-LDIndex                   -1.254e+02  6.916e+01  -1.813   0.0722 .  
-PopMales                   6.121e-03  2.867e-03   2.135   0.0347 *  
-Businesses                 1.813e-01  1.493e-02  12.141  < 2e-16 ***
-ChildCareSpaces            1.119e-02  9.859e-02   0.113   0.9098    
-SocialAssistance           6.778e-02  8.438e-03   8.033 5.40e-13 ***
-GreenSpaces               -3.818e+00  6.193e+00  -0.616   0.5387    
-PollutantsAir              1.002e-04  4.516e-05   2.219   0.0283 *  
-HomePrices                -4.929e-06  3.944e-05  -0.125   0.9007    
-PercentMidCentHRHousehold -1.449e+00  4.837e-01  -2.995   0.0033 ** 
-SocialHousingUnits         7.792e-02  1.315e-02   5.926 2.69e-08 ***
-RoadVolume                -1.166e-03  3.617e-03  -0.322   0.7477    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 83.59 on 128 degrees of freedom
-Multiple R-squared:  0.8844,    Adjusted R-squared:  0.8745 
-F-statistic: 89.06 on 11 and 128 DF,  p-value: < 2.2e-16
-
-Show in New WindowClear OutputExpand/Collapse Output
-
-Call:
-lm(formula = TMCI ~ LDIndex + PopMales + Businesses + SocialAssistance + 
-    GreenSpaces + PollutantsAir + PercentMidCentHRHousehold + 
-    SocialHousingUnits + RoadVolume, data = WTdata)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--331.18  -38.33   -1.36   47.86  242.44 
-
-Coefficients:
-                            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)                1.353e+02  3.768e+01   3.592 0.000463 ***
-LDIndex                   -1.219e+02  5.725e+01  -2.130 0.035068 *  
-PopMales                   6.170e-03  2.568e-03   2.402 0.017700 *  
-Businesses                 1.812e-01  1.481e-02  12.238  < 2e-16 ***
-SocialAssistance           6.815e-02  7.789e-03   8.749 9.64e-15 ***
-GreenSpaces               -3.803e+00  6.100e+00  -0.624 0.534027    
-PollutantsAir              1.006e-04  4.453e-05   2.260 0.025506 *  
-PercentMidCentHRHousehold -1.458e+00  4.764e-01  -3.062 0.002675 ** 
-SocialHousingUnits         7.797e-02  1.275e-02   6.115 1.05e-08 ***
-RoadVolume                -1.225e-03  3.539e-03  -0.346 0.729785    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 82.95 on 130 degrees of freedom
-Multiple R-squared:  0.8844,    Adjusted R-squared:  0.8764 
-F-statistic: 110.5 on 9 and 130 DF,  p-value: < 2.2e-16
-
-Analysis of Variance Table
-
-Model 1: TMCI ~ LDIndex + PopMales + Businesses + ChildCareSpaces + SocialAssistance + 
-    GreenSpaces + PollutantsAir + HomePrices + PercentMidCentHRHousehold + 
-    SocialHousingUnits + RoadVolume
-Model 2: TMCI ~ LDIndex + PopMales + Businesses + SocialAssistance + GreenSpaces + 
-    PollutantsAir + PercentMidCentHRHousehold + SocialHousingUnits + 
-    RoadVolume
-  Res.Df    RSS Df Sum of Sq      F Pr(>F)
-1    128 894333                           
-2    130 894533 -2   -200.39 0.0143 0.9858
-Show in New WindowClear OutputExpand/Collapse Output
 
 Call:
 lm(formula = TMCI ~ LDIndex + PopMales + Businesses + SocialAssistance + 
@@ -549,7 +471,7 @@ W = 0.96666, p-value = 0.0017
 
     Shapiro-Wilk normality test
 
-data:  residuals(fit6)
+data:  residuals(fit4)
 W = 0.95405, p-value = 0.0001293
 
 ############################################################################################
