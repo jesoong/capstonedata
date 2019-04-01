@@ -519,16 +519,17 @@ W = 0.95358, p-value = 0.002289
 [1] 0.8569845
 
 ############################################################################################
-CHECKING LINEAR MODELS FULL & REDUCED
+Checking Full and Reduced Linear Models
 ```{r}
-anova(fit3, fit6) 
+fit4 <- lm(TMCI ~  Businesses  + SocialAssistance  + PercentMidCentHRHousehold + SocialHousingUnits, data=WTdata)
+anova(fit3, fit4) 
 
-par(mfrow = c(2, 2))
+par(mfrow = c(2, 2)
 plot(fit3)
 par(mfrow = c(2, 2))
-plot(fit6)
+plot(fit4)
 shapiro.test(residuals(fit3))
-shapiro.test(residuals(fit6))
+shapiro.test(residuals(fit4))
 ```
 
 Analysis of Variance Table
@@ -554,6 +555,57 @@ W = 0.96666, p-value = 0.0017
 data:  residuals(fit6)
 W = 0.95405, p-value = 0.0001293
 
+############################################################################################
 
+Linear Regression With Transformations
+```{r}
+WTdata$LogTMCI <- log(WTdata$TMCI)
+WTdata$LogBusinesses <- log(WTdata$Businesses)
+WTdata$LogSocialAssistance <- log(WTdata$SocialAssistance)
+WTdata$LogPopMales <- log(WTdata$PopMales)
+WTdata$LogGreenSpaces <- log(WTdata$GreenSpaces)
+
+#full model:
+#Tfit1 <- lm(LogTMCI ~ LDIndex + LogPopMales + LogBusinesses + ChildCareSpaces + LogSocialAssistance + LogGreenSpaces + PollutantsAir + SqrtHomePrices + PercentMidCentHRHousehold + SqrtSocialHousingUnits+ RoadVolume , data=WTdata)
+
+#reduced model:
+Tfit1 <- lm(LogTMCI ~ LDIndex + LogPopMales + LogBusinesses  + LogSocialAssistance    + PercentMidCentHRHousehold + SocialHousingUnits , data=WTdata)
+summary(Tfit1)
+par(mfrow = c(2, 2))  
+plot(Tfit1)
+shapiro.test(residuals(Tfit1))
+
+```
+
+Call:
+lm(formula = LogTMCI ~ LDIndex + LogPopMales + LogBusinesses + 
+    LogSocialAssistance + PercentMidCentHRHousehold + SocialHousingUnits, 
+    data = WTdata)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.67895 -0.15899  0.00686  0.16521  0.83547 
+
+Coefficients:
+                            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                1.776e-01  5.111e-01   0.347 0.728766    
+LDIndex                   -4.428e-01  2.016e-01  -2.196 0.029815 *  
+LogPopMales                2.071e-01  7.598e-02   2.726 0.007284 ** 
+LogBusinesses              2.684e-01  3.141e-02   8.543 2.66e-14 ***
+LogSocialAssistance        3.236e-01  3.931e-02   8.231 1.51e-13 ***
+PercentMidCentHRHousehold -2.479e-03  1.415e-03  -1.752 0.082045 .  
+SocialHousingUnits         1.440e-04  3.913e-05   3.679 0.000339 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.2599 on 133 degrees of freedom
+Multiple R-squared:  0.8286,    Adjusted R-squared:  0.8208 
+F-statistic: 107.1 on 6 and 133 DF,  p-value: < 2.2e-16
+
+
+    Shapiro-Wilk normality test
+
+data:  residuals(Tfit1)
+W = 0.9858, p-value = 0.1584
 
 
