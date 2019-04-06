@@ -117,22 +117,134 @@ Bivariate(
 
 
 //Second round
-
-
+Principal Components(
+	Y(
+		:LDIndex,
+		:PopMales,
+		:Businesses,
+		:ChildCareSpaces,
+		:SocialAssistance,
+		:GreenSpaces,
+		:PollutantsAir,
+		:HomePrices,
+		:PercentMidCentHRHousehold,
+		:SocialHousingUnits,
+		:RoadVolume
+	),
+	Z( :TMCI ),
+	Estimation Method( "Default" ),
+	"on Correlations",
+	Where( :CV2 == "train" ),
+	SendToReport(
+		Dispatch(
+			{"Summary Plots"},
+			"PCA Summary Plots",
+			FrameBox,
+			{Frame Size( 43, 38 )}
+		),
+		Dispatch(
+			{"Summary Plots"},
+			"PCA Summary Plots",
+			FrameBox( 2 ),
+			{Frame Size( 52, 38 )}
+		)
+	)
+)
 //Saved Columns for PC1 and PC2
 
+//Fit regression for TMCI on the PC dimensions
+Fit Model(
+	Y( :TMCI ),
+	Effects(
+		:Prin1 By CV2,
+		:Prin2 By CV2,
+		:Prin1 By CV2 * :Prin1 By CV2,
+		:Prin2 By CV2 * :Prin2 By CV2
+	),
+	Personality( "Standard Least Squares" ),
+	Emphasis( "Effect Leverage" ),
+	Run(
+		:TMCI << {Summary of Fit( 1 ), Analysis of Variance( 1 ),
+		Parameter Estimates( 1 ), Lack of Fit( 0 ), Scaled Estimates( 0 ),
+		Plot Actual by Predicted( 1 ), Plot Regression( 0 ),
+		Plot Residual by Predicted( 1 ), Plot Studentized Residuals( 0 ),
+		Plot Effect Leverage( 1 ), Plot Residual by Normal Quantiles( 0 ),
+		Box Cox Y Transformation( 0 )}
+	)
+)
 
 //Compare Predicted and Actual 
-
+Bivariate(
+	Y( :TMCI ),
+	X( :Pred Formula TMCI 3 ),
+	Fit Line( {Line Color( {212, 73, 88} )} ),
+	By( :CV2 )
+)
 
 //Third round
-
-
-
+Principal Components(
+	Y(
+		:LDIndex,
+		:PopMales,
+		:Businesses,
+		:ChildCareSpaces,
+		:SocialAssistance,
+		:GreenSpaces,
+		:PollutantsAir,
+		:HomePrices,
+		:PercentMidCentHRHousehold,
+		:SocialHousingUnits,
+		:RoadVolume
+	),
+	Z( :TMCI ),
+	Estimation Method( "Default" ),
+	"on Correlations",
+	Where( :CV3 == "train" ),
+	SendToReport(
+		Dispatch(
+			{"Summary Plots"},
+			"PCA Summary Plots",
+			FrameBox,
+			{Frame Size( 43, 38 )}
+		),
+		Dispatch(
+			{"Summary Plots"},
+			"PCA Summary Plots",
+			FrameBox( 2 ),
+			{Frame Size( 52, 38 )}
+		)
+	)
+)
 //Saved Columns for PC1 and PC2
 
+//Fit regression for TMCI on the PC dimensions
+Fit Model(
+	Y( :TMCI ),
+	Effects(
+		:Prin1 By CV3,
+		:Prin2 By CV3,
+		:Prin1 By CV3 * :Prin1 By CV3,
+		:Prin2 By CV3 * :Prin2 By CV3
+	),
+	Personality( "Standard Least Squares" ),
+	Emphasis( "Effect Leverage" ),
+	Run(
+		:TMCI << {Summary of Fit( 1 ), Analysis of Variance( 1 ),
+		Parameter Estimates( 1 ), Lack of Fit( 0 ), Scaled Estimates( 0 ),
+		Plot Actual by Predicted( 1 ), Plot Regression( 0 ),
+		Plot Residual by Predicted( 1 ), Plot Studentized Residuals( 0 ),
+		Plot Effect Leverage( 1 ), Plot Residual by Normal Quantiles( 0 ),
+		Box Cox Y Transformation( 0 )}
+	)
+)
 
 //Compare Predicted and Actual 
-
+Bivariate(
+	SendToByGroup( Bygroup Default ),
+	Y( :TMCI ),
+	X( :Pred Formula TMCI 4 ),
+	SendToByGroup( {:CV3 == "test"}, Fit Line( {Line Color( {212, 73, 88} )} ) ),
+	By( :CV3 )
+)
 
 
