@@ -1,1 +1,138 @@
 
+//PCA Analysis using the 11 variables and TCMI as supplementary data
+
+Principal Components(
+	Y(
+		:LDIndex,
+		:PopMales,
+		:Businesses,
+		:ChildCareSpaces,
+		:SocialAssistance,
+		:GreenSpaces,
+		:PollutantsAir,
+		:HomePrices,
+		:PercentMidCentHRHousehold,
+		:SocialHousingUnits,
+		:RoadVolume
+	),
+	Z( :TMCI ),
+	Estimation Method( "Default" ),
+	"on Correlations",
+	Loading Matrix( 1 ),
+	Biplot( 2 ),
+	SendToReport(
+		Dispatch(
+			{"Summary Plots"},
+			"PCA Summary Plots",
+			FrameBox,
+			{Frame Size( 43, 38 )}
+		),
+		Dispatch(
+			{"Summary Plots"},
+			"PCA Summary Plots",
+			FrameBox( 2 ),
+			{Frame Size( 52, 38 )}
+		),
+		Dispatch( {"Biplot"}, "PCA BiPlot", FrameBox( 2 ), {Frame Size( 43, 38 )} )
+	)
+)
+
+//Contour Plot to visualize TMCI in the PC1 PC2 dimensions
+
+Contour Plot(
+	X( :Prin1, :Prin2 ),
+	Y( :TMCI ),
+	Show Boundary( 0 ),
+	Show Data Points( 1 ),
+	Fill Areas( 1 ),
+	Label Contours( 0 ),
+	Transform( "None" ),
+	Show Boundary( 0 ),
+	Specify Contours( Min( 200 ), Max( 1200 ), N( 6 ) ),
+	SendToReport(
+		Dispatch( {}, "Contour Plot Graph", FrameBox, {Marker Size( 0 )} )
+	)
+)
+
+//Added columns for 'Section' (3 sections for cross validation), 'CV1','CV2, and 'CV3 to assign rows for train/test.
+
+//First round
+Principal Components(
+	Y(
+		:LDIndex,
+		:PopMales,
+		:Businesses,
+		:ChildCareSpaces,
+		:SocialAssistance,
+		:GreenSpaces,
+		:PollutantsAir,
+		:HomePrices,
+		:PercentMidCentHRHousehold,
+		:SocialHousingUnits,
+		:RoadVolume
+	),
+	Z( :TMCI ),
+	Estimation Method( "Default" ),
+	"on Correlations",
+	Where( :CV1 == "train" ),
+	SendToReport(
+		Dispatch(
+			{"Summary Plots"},
+			"PCA Summary Plots",
+			FrameBox,
+			{Frame Size( 43, 38 )}
+		),
+		Dispatch(
+			{"Summary Plots"},
+			"PCA Summary Plots",
+			FrameBox( 2 ),
+			{Frame Size( 52, 38 )}
+		)
+	)
+)
+//Saved Columns for PC1 and PC2
+
+//Fit regression for TMCI on the PC dimensions
+Fit Model(
+	Y( :TMCI ),
+	By( :CV1 ),
+	Effects(
+		:Prin1 By CV1,
+		:Prin2 By CV1,
+		:Prin1 By CV1 * :Prin1 By CV1,
+		:Prin2 By CV1 * :Prin2 By CV1
+	),
+	Personality( "Stepwise" ),
+	Run
+)
+
+//Compare Predicted and Actual 
+Bivariate(
+	Y( :TMCI ),
+	X( :Pred Formula TMCI 2 ),
+	Fit Line( {Line Color( {212, 73, 88} )} ),
+	By( :CV1 )
+)
+
+
+
+//Second round
+
+
+//Saved Columns for PC1 and PC2
+
+
+//Compare Predicted and Actual 
+
+
+//Third round
+
+
+
+//Saved Columns for PC1 and PC2
+
+
+//Compare Predicted and Actual 
+
+
+
